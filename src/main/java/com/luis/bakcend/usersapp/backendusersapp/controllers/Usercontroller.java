@@ -11,6 +11,7 @@ import com.luis.bakcend.usersapp.backendusersapp.services.UserService;
 
 @RestController
 @RequestMapping("/users")
+@CrossOrigin("*")
 public class Usercontroller {
 
     @Autowired
@@ -48,7 +49,7 @@ public class Usercontroller {
             User userDb = o.orElseThrow();
 
             userDb.setUsername(user.getUsername());
-            userDb.setEmail(userDb.getEmail());
+            userDb.setEmail(user.getEmail());
 
             return ResponseEntity.status(HttpStatus.CREATED).body(service.save(userDb));
         } else {
