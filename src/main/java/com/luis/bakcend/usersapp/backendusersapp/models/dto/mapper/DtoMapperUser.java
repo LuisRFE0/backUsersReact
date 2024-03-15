@@ -5,22 +5,20 @@ import com.luis.bakcend.usersapp.backendusersapp.models.entities.User;
 
 public class DtoMapperUser {
 
-    private static DtoMapperUser mapper;
-
     private User user;
 
     private DtoMapperUser() {
 
     }
 
-    public static DtoMapperUser getInstance() {
-        mapper = new DtoMapperUser();
-        return mapper;
+    public static DtoMapperUser builder() {
+        return new DtoMapperUser();
+
     }
 
     public DtoMapperUser serUser(User user) {
         this.user = user;
-        return mapper;
+        return this;
     }
 
     public UserDto build() {

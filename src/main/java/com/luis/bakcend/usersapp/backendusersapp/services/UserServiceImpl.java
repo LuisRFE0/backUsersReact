@@ -3,12 +3,15 @@ package com.luis.bakcend.usersapp.backendusersapp.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.luis.bakcend.usersapp.backendusersapp.models.dto.UserDto;
+import com.luis.bakcend.usersapp.backendusersapp.models.dto.mapper.DtoMapperUser;
 import com.luis.bakcend.usersapp.backendusersapp.models.entities.Role;
 import com.luis.bakcend.usersapp.backendusersapp.models.entities.User;
 import com.luis.bakcend.usersapp.backendusersapp.repositories.RoleRepository;
@@ -28,23 +31,28 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<User> findAll() {
+    public List<UserDto> findAll() {
 
-        return (List<User>) repository.findAll();
-
+        List<User> users = (List<User>) repository.findAll();
+        return users
+                .stream()
+                .map(u -> DtoMapperUser.builder().serUser(u).build())
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<User> findById(Long id) {
+    public Optional<UserDto> findById(Long id) {
 
-        return repository.findById(id);
-
+        return repository.findById(id).map(u -> DtoMapperUser
+                .builder()
+                .serUser(u)
+                .build());
     }
 
     @Override
     @Transactional
-    public User save(User user) {
+    public UserDto save(User user) {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
@@ -58,7 +66,7 @@ public class UserServiceImpl implements UserService {
 
         user.setRoles(roles);
 
-        return repository.save(user);
+        return DtoMapperUser.builder().serUser(repository.save(user)).build();
 
     }
 
@@ -67,6 +75,13 @@ public class UserServiceImpl implements UserService {
     public void remove(Long id) {
 
         repository.deleteById(id);
+
+    }
+
+    @Override
+    public Optional<User> findById2(Long id) {
+
+        return repository.findById(id);
 
     }
 

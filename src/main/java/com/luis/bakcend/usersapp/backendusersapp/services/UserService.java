@@ -3,15 +3,20 @@ package com.luis.bakcend.usersapp.backendusersapp.services;
 import java.util.List;
 import java.util.Optional;
 
+import com.luis.bakcend.usersapp.backendusersapp.models.dto.UserDto;
 import com.luis.bakcend.usersapp.backendusersapp.models.entities.User;
+
+import jakarta.validation.Valid;
 
 public interface UserService {
 
-    List<User> findAll();
+    List<UserDto> findAll();
 
-    Optional<User> findById(Long id);
+    Optional<UserDto> findById(Long id);
 
-    User save(User user);
+    Optional<User> findById2(Long id);
+
+    UserDto save(@Valid User user);
 
     void remove(Long id);
 }

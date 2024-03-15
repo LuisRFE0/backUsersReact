@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import com.luis.bakcend.usersapp.backendusersapp.models.dto.UserDto;
 import com.luis.bakcend.usersapp.backendusersapp.models.entities.User;
 import com.luis.bakcend.usersapp.backendusersapp.services.UserService;
 
@@ -23,14 +25,14 @@ public class Usercontroller {
     private UserService service;
 
     @GetMapping
-    public List<User> list() {
+    public List<UserDto> list() {
         return service.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> show(@PathVariable(name = "id") Long id) {
 
-        Optional<User> userOptional = service.findById(id);
+        Optional<UserDto> userOptional = service.findById(id);
 
         if (userOptional.isPresent()) {
             return ResponseEntity.ok(userOptional.orElseThrow());
@@ -42,11 +44,9 @@ public class Usercontroller {
 
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody User user, BindingResult result) {
-
         if (result.hasErrors()) {
             return validation(result);
         }
-
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(user));
     }
 
@@ -57,7 +57,7 @@ public class Usercontroller {
             return validation(result);
         }
 
-        Optional<User> o = service.findById(id);
+        Optional<User> o = service.findById2(id);
 
         if (o.isPresent()) {
             User userDb = o.orElseThrow();
@@ -74,7 +74,7 @@ public class Usercontroller {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> remove(@PathVariable Long id) {
-        Optional<User> o = service.findById(id);
+        Optional<UserDto> o = service.findById(id);
 
         if (o.isPresent()) {
             service.remove(id);
