@@ -1,6 +1,7 @@
 package com.luis.bakcend.usersapp.backendusersapp.auth.filters;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
@@ -16,6 +18,7 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.luis.bakcend.usersapp.backendusersapp.models.entities.User;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
 import static com.luis.bakcend.usersapp.backendusersapp.auth.TokenJwtConfig.*;
@@ -68,7 +71,20 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String username = ((org.springframework.security.core.userdetails.User) authResult.getPrincipal())
                 .getUsername();
 
-        String token = Jwts.builder().setSubject(username).signWith(SECRET_KEY).setIssuedAt(new Date())
+        Collection<? extends GrantedAuthority> roles = authResult.getAuthorities();
+
+        boolean isAdmin = roles.stream().anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"));
+
+        Claims claims = Jwts.claims();
+
+        claims.put("authorities", new ObjectMapper().writeValueAsString(roles));
+        claims.put("isAdmin", isAdmin);
+
+        String token = Jwts.builder()
+                .setClaims(claims)
+                .setSubject(username)
+                .signWith(SECRET_KEY)
+                .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 3600000)).compact();
 
         response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + token);
